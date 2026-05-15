@@ -13,5 +13,6 @@ void drawWheel(
 void drawGaugeContent();
 
 void drawRacecar();
+void drawHUDGauge();
 
 #endif

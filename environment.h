@@ -4,8 +4,10 @@
 #include "structs.h"
 
 void loadGrassTexture();
-
 void drawGrass();
+
+void loadBillboardTexture();
+void drawBillboard();
 
 void drawCloud(float x, float y, float z);
 void drawClouds();

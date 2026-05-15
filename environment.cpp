@@ -10,6 +10,10 @@
 #include <GL/glut.h>
 #endif
 
+#ifndef GL_CLAMP_TO_EDGE
+#define GL_CLAMP_TO_EDGE 0x812F
+#endif
+
 CloudPosition cloudPositions[] = {
     {5.0, 5.0, 10.0},
     {-15.0, 7.0, 5.0},
@@ -287,7 +291,85 @@ void loadGrassTexture() {
         std::cerr << "OpenGL error: " << gluErrorString(err) << std::endl;
     }
 }
+
 // Generate a random float in range [min, max]
 float randomFloatInRange(float min, float max) {
     return min + ((float)rand() / (float)(RAND_MAX)) * (max - min);
+}
+
+// loadBillboardTexture
+void loadBillboardTexture() {
+    BitMapFile *image[1];
+    image[0] = getBMPData("textures/billboard.bmp");
+
+    glGenTextures(1, textureBillboard);
+    glBindTexture(GL_TEXTURE_2D, textureBillboard[0]);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image[0]->sizeX, image[0]->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, image[0]->data);
+
+    GLenum err = glGetError();
+    if (err != GL_NO_ERROR) {
+        std::cerr << "OpenGL error: " << gluErrorString(err) << std::endl;
+    }
+}
+
+void drawBillboard(void) {
+    float bx     = 325.0f;
+    float bz     = -60.0f;
+    float poleH  = 18.0f;
+    float boardW = 50.0f;
+    float boardH = 30.0f;
+    float halfW  = boardW * 0.5f;
+    float boardY = poleH;
+
+    // Tiang & bingkai (sama seperti sebelumnya)
+    glColor3f(0.40f, 0.42f, 0.45f);
+    drawCylinder(bx + 2.0f, 0, bz - halfW * 0.55f,
+                 bx + 2.0f, poleH + boardH + 1.5f, bz - halfW * 0.55f, 1.8f);
+    drawCylinder(bx + 2.0f, 0, bz + halfW * 0.55f,
+                 bx + 2.0f, poleH + boardH + 1.5f, bz + halfW * 0.55f, 1.8f);
+    drawCylinder(bx + 2.0f, boardY,          bz - halfW * 0.55f,
+                 bx + 2.0f, boardY,          bz + halfW * 0.55f, 0.9f);
+    drawCylinder(bx + 2.0f, boardY + boardH, bz - halfW * 0.55f,
+                 bx + 2.0f, boardY + boardH, bz + halfW * 0.55f, 0.9f);
+
+    glColor3f(0.12f, 0.12f, 0.14f);
+    glBegin(GL_QUADS);
+        glNormal3f(1, 0, 0);
+        glVertex3f(bx + 0.6f, boardY,          bz - halfW);
+        glVertex3f(bx + 0.6f, boardY,          bz + halfW);
+        glVertex3f(bx + 0.6f, boardY + boardH, bz + halfW);
+        glVertex3f(bx + 0.6f, boardY + boardH, bz - halfW);
+    glEnd();
+
+    glColor3f(0.20f, 0.20f, 0.22f);
+    drawBoxFromCorners(bx + 0.1f, boardY - 1.2f, bz - halfW - 1.2f,
+                       bx + 0.6f, boardY + boardH + 1.2f, bz - halfW);
+    drawBoxFromCorners(bx + 0.1f, boardY - 1.2f, bz + halfW,
+                       bx + 0.6f, boardY + boardH + 1.2f, bz + halfW + 1.2f);
+    drawBoxFromCorners(bx + 0.1f, boardY - 1.2f, bz - halfW,
+                       bx + 0.6f, boardY,         bz + halfW);
+    drawBoxFromCorners(bx + 0.1f, boardY + boardH, bz - halfW,
+                       bx + 0.6f, boardY + boardH + 1.2f, bz + halfW);
+
+    glDisable(GL_LIGHTING);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, textureBillboard[0]);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    glColor3f(1.0f, 1.0f, 1.0f);
+
+    glBegin(GL_QUADS);
+    glNormal3f(-1, 0, 0);
+        glTexCoord2f(1.0f, 1.0f); glVertex3f(bx, boardY,          bz + halfW);
+        glTexCoord2f(0.0f, 1.0f); glVertex3f(bx, boardY,          bz - halfW);
+        glTexCoord2f(0.0f, 0.0f); glVertex3f(bx, boardY + boardH, bz - halfW);
+        glTexCoord2f(1.0f, 0.0f); glVertex3f(bx, boardY + boardH, bz + halfW);
+    glEnd();
+
+    glDisable(GL_TEXTURE_2D);
+    glEnable(GL_LIGHTING);
 }

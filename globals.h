@@ -26,6 +26,7 @@ extern float maxVelocity;
 extern bool day;
 
 extern GLuint textureGrass[1];
+extern unsigned int textureBillboard[1];
 
 extern CloudPosition cloudPositions[];;
 

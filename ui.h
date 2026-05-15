@@ -21,5 +21,6 @@ void renderCenteredText(
 );
 
 void drawMPHDial(float mph);
+void drawSpeedometerHUD();
 
 #endif

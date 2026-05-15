@@ -53,6 +53,9 @@ void setup(void)
     
     initConfetti(confettiCannon1, 200.0, 0.0, 100);
     initConfetti(confettiCannon2, 280.0, 10.0, 100);
+
+    loadGrassTexture();
+    loadBillboardTexture();
 }
 
 void resize(int w, int h)
@@ -194,8 +197,8 @@ void update(int value) {
     // Handling turning while moving
     if (velocity != 0 && lapStartTime) {
         float turnAdjustment = (fabs(velocity) <= 2) ?
-            (turnSpeed * 0.5 * (velocity > 0 ? 1 : -1)) :
-            (turnSpeed * (1.0 - 0.5 * (fabs(velocity) / maxVelocity)) * (velocity > 0 ? 1 : -1));
+            (turnSpeed * 1.4 * (velocity > 0 ? 1 : -1)) :
+            (turnSpeed * (1.8 - 0.3 * (fabs(velocity) / maxVelocity)) * (velocity > 0 ? 1 : -1));
 
         if (keyStates['a']) { // Turn left
             angleX += turnAdjustment;
@@ -283,7 +286,7 @@ void drawScene(void)
         cameraAngle += 0.005;  // Increment the angle for smooth rotation
         
         setOrthographicProjection();
-        renderCenteredText("OpenGL Racing Simulator");
+        renderCenteredText("Furiosa Racing");
         resetPerspectiveProjection();
     } else {
         // Standard game camera logic
@@ -317,6 +320,7 @@ void drawScene(void)
               0.0f, 1.0f, 0.0f); // Up vector
 
     drawGrass();
+    drawBillboard();
     drawHill(-200, 0, 450, 90);
     drawClouds();
     drawTrees();
@@ -325,6 +329,8 @@ void drawScene(void)
     drawStartLight();
     drawTeapot();
     drawRacecar();
+    drawHUDGauge();
+
     if(day){drawSun();}
     else{drawMoon();}
     
@@ -350,6 +356,7 @@ void drawScene(void)
         drawText("Press 'r' to restart.", 10, 70);  // Draw text on the screen
         resetPerspectiveProjection();  // Switch back to your 3D projection
     }
+
     if(!fpv){ // Third person view dials
         setOrthographicProjection();
         float mph = velocity * 25;

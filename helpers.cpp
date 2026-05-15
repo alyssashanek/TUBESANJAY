@@ -16,22 +16,32 @@
 // Load bmp files
 BitMapFile *getBMPData(std::string filename) {
     BitMapFile *bmp = new BitMapFile;
-    unsigned int size, offset, headerSize;
     std::ifstream infile(filename.c_str(), std::ios::binary);
+    if (!infile) {
+        std::cerr << "Cannot open file: " << filename << std::endl;
+        return nullptr;
+    }
+    unsigned int dataOffset;
     infile.seekg(10);
-    infile.read((char *) &offset, 4);
-    infile.read((char *) &headerSize, 4);
+    infile.read((char*)&dataOffset, 4);
     infile.seekg(18);
-    infile.read((char *) &bmp->sizeX, 4);
-    infile.read((char *) &bmp->sizeY, 4);
-    size = bmp->sizeX * bmp->sizeY * 24;
-    bmp->data = new unsigned char[size];
-    infile.seekg(offset);
-    infile.read((char *) bmp->data, size);
-    for (int i = 0; i < size; i += 3) {
-        char temp = bmp->data[i];
-        bmp->data[i] = bmp->data[i+2];
-        bmp->data[i+2] = temp;
+    infile.read((char*)&bmp->sizeX, 4);
+    infile.read((char*)&bmp->sizeY, 4);
+    int width = bmp->sizeX;
+    int height = bmp->sizeY;
+    int rowPadded = (width * 3 + 3) & (~3);
+    bmp->data = new unsigned char[width * height * 3];
+    std::vector<unsigned char> row(rowPadded);
+    infile.seekg(dataOffset);
+    for (int y = 0; y < height; y++) {
+        infile.read((char*)row.data(), rowPadded);
+        for (int x = 0; x < width; x++) {
+            int dst = ((height - 1 - y) * width + x) * 3;
+            int src = x * 3;
+            bmp->data[dst + 0] = row[src + 2];
+            bmp->data[dst + 1] = row[src + 1];
+            bmp->data[dst + 2] = row[src + 0];
+        }
     }
     return bmp;
 }

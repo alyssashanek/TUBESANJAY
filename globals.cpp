@@ -17,6 +17,7 @@ float maxVelocity = 3.0;
 bool day = true;
 
 GLuint textureGrass[1];
+unsigned int textureBillboard[1];
 
 float cloudSpeed = 0.1f;
 

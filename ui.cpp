@@ -2,6 +2,9 @@
 #include "globals.h"
 
 #include <cstring>
+#include <cmath>
+#include <cstdio>
+#include <algorithm>
 
 #ifdef __APPLE__
 #include <GLUT/glut.h>
