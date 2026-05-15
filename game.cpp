@@ -19,38 +19,48 @@ using namespace std;
 #include <GL/glut.h>
 #endif
 
-void setup(void)
-{
-    glEnable(GL_DEPTH_TEST); // Enable depth testing.
+void setup(void) {
+    glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
-    
-    // Sunlight
-    float sunlightPos[] = {0.0, 100.0, 100.0, 0.0};
+    glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHT1);
+    glEnable(GL_LIGHT2);
+
+    // SUN LIGHT POSITION
+    GLfloat sunlightPos[] = {250.0f, 350.0f, 250.0f, 1.0f};
     glLightfv(GL_LIGHT0, GL_POSITION, sunlightPos);
 
-    // Common spotlight properties
-    GLfloat lightDiffuse[] = {1.0, 1.0, 1.0, 1.0};
-    GLfloat lightSpecular[] = {1.0, 1.0, 1.0, 1.0};
+    // GLOBAL AMBIENT
+    GLfloat globalAmbient[] = {0.55f, 0.55f, 0.55f, 1.0f};
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
 
+    // SUN DIFFUSE
+    GLfloat lightDiffuse[] = {1.0f, 1.0f, 0.95f, 1.0f};
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
+
+    // SUN SPECULAR
+    GLfloat lightSpecular[] = {1.0f, 1.0f, 1.0f, 1.0f};
+    glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular);
+
+    // HEADLIGHTS
     glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse);
     glLightfv(GL_LIGHT1, GL_SPECULAR, lightSpecular);
-
     glLightfv(GL_LIGHT2, GL_DIFFUSE, lightDiffuse);
     glLightfv(GL_LIGHT2, GL_SPECULAR, lightSpecular);
+    GLfloat spotCutoff = 60.0f;
+    glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, spotCutoff);
+    glLightf(GL_LIGHT2, GL_SPOT_CUTOFF, spotCutoff);
 
-    GLfloat spotCutoff[] = {60.0};
-    glLightfv(GL_LIGHT1, GL_SPOT_CUTOFF, spotCutoff);
-    glLightfv(GL_LIGHT2, GL_SPOT_CUTOFF, spotCutoff);
-    
-    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globAmb);  // Global ambient light.
-    glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE); // Enable local viewpoint.
-
+    // MATERIAL
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-    
+    glShadeModel(GL_SMOOTH);
+    glEnable(GL_NORMALIZE);
+    glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+
     currentLightRow = -1;
     updateLightSequence(0);
-    
+
     initConfetti(confettiCannon1, 200.0, 0.0, 100);
     initConfetti(confettiCannon2, 280.0, 10.0, 100);
 
@@ -327,7 +337,7 @@ void drawScene(void)
     drawTrack();
     drawStartFinishLine();
     drawStartLight();
-    drawTeapot();
+    drawTrophy();
     drawRacecar();
     drawHUDGauge();
 

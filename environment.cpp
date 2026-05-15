@@ -263,12 +263,85 @@ void updateAndDrawConfetti(ConfettiParticle confetti[]) {
     glEnable(GL_LIGHTING);
 }
 
-void drawTeapot(void){
+void drawTrophy(void) {
     glPushMatrix();
-    glTranslatef(0.0f, 25.0f, 0.0f);
+    
+    glPushAttrib(GL_LIGHTING_BIT); 
+
+    GLfloat gold_specular[] = { 1.0f, 0.95f, 0.60f, 1.0f }; // Pantulan cahaya kekuningan
+    GLfloat gold_shininess[] = { 80.0f }; // Semakin tinggi, semakin mengkilap seperti logam
+    glMaterialfv(GL_FRONT, GL_SPECULAR, gold_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, gold_shininess);
+
+    // Posisi dan Rotasi
+    glTranslatef(0.0f, 0.0f, 0.0f);
     glRotatef(teapotRotationAngle, 0, 1, 0);
-    glColor3f(1.0f, 0.8f, 0.0f);
-    glutSolidTeapot(40.0); // The parameter is the radius of the teapot
+
+    GLUquadric* quad = gluNewQuadric();
+    gluQuadricNormals(quad, GLU_SMOOTH); // Memastikan cahaya jatuh dengan halus
+
+    // -- 1. BASE PIALA (Bagian Bawah) --
+    glPushMatrix();
+    glRotatef(-90, 1, 0, 0); 
+    glColor3f(0.85f, 0.65f, 0.15f); // Base gold
+    gluCylinder(quad, 20.0, 16.0, 10.0, 32, 1);
+    glTranslatef(0, 0, 10.0);
+    gluDisk(quad, 0, 16.0, 32, 1);
+    glPopMatrix();
+
+    // -- 2. STEM / LEHER PIALA (Mengecil ke atas) --
+    glPushMatrix();
+    glTranslatef(0.0f, 10.0f, 0.0f);
+    glRotatef(-90, 1, 0, 0);
+    glColor3f(1.00f, 0.85f, 0.25f); // Lebih terang
+    gluCylinder(quad, 12.0, 5.0, 25.0, 32, 1);
+    glPopMatrix();
+
+    // -- 3. MANGKUK BAWAH (Melebar ke atas) --
+    glPushMatrix();
+    glTranslatef(0.0f, 35.0f, 0.0f);
+    glRotatef(-90, 1, 0, 0);
+    glColor3f(0.95f, 0.80f, 0.20f); 
+    gluCylinder(quad, 5.0, 30.0, 20.0, 32, 1);
+    glPopMatrix();
+
+    // -- 4. MANGKUK ATAS (Badan Cup) --
+    glPushMatrix();
+    glTranslatef(0.0f, 55.0f, 0.0f);
+    glRotatef(-90, 1, 0, 0);
+    glColor3f(1.00f, 0.85f, 0.25f); 
+    gluCylinder(quad, 30.0, 32.0, 25.0, 32, 1);
+    glPopMatrix();
+
+    // -- 5. BAGIAN DALAM MANGKUK (Warna Gelap) --
+    glPushMatrix();
+    glTranslatef(0.0f, 55.0f, 0.0f);
+    glRotatef(-90, 1, 0, 0);
+    glColor3f(0.40f, 0.30f, 0.05f); 
+    gluCylinder(quad, 29.5, 31.5, 25.5, 32, 1); 
+    gluDisk(quad, 0, 29.5, 32, 1);
+    glPopMatrix();
+
+    // -- 6. AKSEN "TRACK" MELENGKUNG (Khas NASCAR) --
+    glColor3f(0.95f, 0.80f, 0.20f); 
+    
+    glPushMatrix();
+    glTranslatef(0.0f, 65.0f, 0.0f);
+    glRotatef(45, 1, 0, 0);
+    glRotatef(30, 0, 1, 0);
+    glutSolidTorus(1.5, 31.0, 16, 32);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(0.0f, 65.0f, 0.0f);
+    glRotatef(-45, 1, 0, 0);
+    glRotatef(60, 0, 1, 0);
+    glutSolidTorus(1.5, 31.0, 16, 32);
+    glPopMatrix();
+
+    gluDeleteQuadric(quad);
+    
+    glPopAttrib(); 
     glPopMatrix();
 }
 

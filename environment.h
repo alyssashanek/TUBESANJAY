@@ -38,6 +38,6 @@ void updateAndDrawConfetti(
     ConfettiParticle confetti[]
 );
 
-void drawTeapot();
+void drawTrophy(void);
 
 #endif
