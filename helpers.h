@@ -19,6 +19,8 @@ void drawCylinder(
 
 void drawCircleXY(float x, float y, float z, float radius);
 
+
+
 void drawQuads(float quads[][5][3], int numQuads);
 
 void drawTriangles(float triangles[][4][3], int numTriangles);
@@ -26,6 +28,16 @@ void drawTriangles(float triangles[][4][3], int numTriangles);
 void drawReflectiveQuads(float quads[][5][3], int numQuads);
 
 void drawCircles(float circles[][7], int count);
+
+void drawCircle(
+    float cx,
+    float cy,
+    float cz,
+    float innerRadius,
+    float outerRadius,
+    float startAngle,
+    float endAngle
+);
 
 void drawMultipleBoxes(float boxes[][6], int count);
 

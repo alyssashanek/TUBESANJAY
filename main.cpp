@@ -1,3 +1,7 @@
+// cd /d/Programming/GTI/"Tugas Besar - Parts"
+// g++ main.cpp car.cpp environment.cpp game.cpp globals.cpp helpers.cpp input.cpp track.cpp ui.cpp -o racingf -lfreeglut -lopengl32 -lglu32
+// ./racingf
+
 #include "globals.h"
 #include "helpers.h"
 #include "environment.h"
@@ -7,21 +11,12 @@
 #include "input.h"
 #include "game.h"
 
-void createStartWindow() {
-    glutInitWindowSize(500, 1000);
-    glutInitWindowPosition(1000, 0);
-    startWindow = glutCreateWindow("Start Screen");
-
-    glutDisplayFunc(drawStartScreen);
-    glutReshapeFunc(startScreenResize);
-    glutMouseFunc(mouseInput);
-}
 void createMainWindow() {
     glutInitWindowSize(1000, 1000);
     glutInitWindowPosition(0, 0);
     mainWindow = glutCreateWindow("OpenGL Racing Simulator");
 
-    setup();  // Setup your OpenGL context and initial states for the main game
+    setup();
     createMenu();
     loadGrassTexture();
 
@@ -30,6 +25,8 @@ void createMainWindow() {
     glutKeyboardFunc(keyInput);
     glutKeyboardUpFunc(keyUp);
     glutSpecialFunc(specialKeyInput);
+    glutMouseFunc(mouseInput);
+
     glutTimerFunc(0, update, 0);
     glutTimerFunc(0, globalTimer, 0);
 
@@ -46,7 +43,6 @@ int main(int argc, char **argv)
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     
-    createStartWindow();
     createMainWindow();
 
     glutMainLoop();

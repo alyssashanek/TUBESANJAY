@@ -19,42 +19,56 @@ void drawButtonLabel(const char* text, int x, int y, int width) {
         glutBitmapCharacter(GLUT_BITMAP_8_BY_13, *c);
     }
 }
+
 void drawStartScreen() {
+    int w = glutGet(GLUT_WINDOW_WIDTH);
+    int h = glutGet(GLUT_WINDOW_HEIGHT);
+
+    glDisable(GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST);
+
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluOrtho2D(0.0, 500, 0.0, 1000);  // Orthographic projection for 2D rendering
+    gluOrtho2D(0.0, w, 0.0, h);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
+    glClearColor(0.02f, 0.02f, 0.08f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(0.0, 0.0, 0.0, 1.0);  // Set the background color
 
-    glColor3f(1.0, 1.0, 1.0);  // Set text color to white
-    glRasterPos2i(175, 800);  // Position the main title text
+    glColor3f(1.0, 1.0, 1.0);
+
     const char* title = "Select Mode";
+    int titleWidth = glutBitmapLength(GLUT_BITMAP_HELVETICA_18, (const unsigned char*)title);
+    glRasterPos2i((w - titleWidth) / 2, h * 0.80);
+
     for (const char* c = title; *c != '\0'; c++) {
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
     }
 
-    int startX = 150;
-    int buttonWidth = 200;
+    int buttonWidth = w * 0.25;
     int buttonHeight = 50;
+    int startX = (w - buttonWidth) / 2;
 
-    // Day Button
-    glColor3f(isDaySelected ? 0.0 : 0.3, isDaySelected ? 1.0 : 0.6, 0.0);  // Change color when selected
-    glRecti(startX, 600, startX + buttonWidth, 650);
-    drawButtonLabel("Day", startX, 625, buttonWidth);
+    int dayY = h * 0.60;
+    int nightY = h * 0.50;
+    int startY = h * 0.40;
 
-    // Night Button
-    glColor3f(isNightSelected * 0.2, isNightSelected * 0.2, isNightSelected ? 1.0 : 0.6);  // Change color when selected
-    glRecti(startX, 500, startX + buttonWidth, 550);
-    drawButtonLabel("Night", startX, 525, buttonWidth);
+    glColor3f(isDaySelected ? 0.0f : 0.3f, isDaySelected ? 1.0f : 0.6f, 0.0f);
+    glRecti(startX, dayY, startX + buttonWidth, dayY + buttonHeight);
+    drawButtonLabel("Day", startX, dayY + buttonHeight / 2, buttonWidth);
 
-    // Play Game Button
-    glColor3f(1.0, 0.0, 0.0);
-    glRecti(startX, 400, startX + buttonWidth, 450);
-    drawButtonLabel("Start Game", startX, 425, buttonWidth);
+    glColor3f(isNightSelected ? 0.2f : 0.1f, isNightSelected ? 0.2f : 0.1f, isNightSelected ? 1.0f : 0.6f);
+    glRecti(startX, nightY, startX + buttonWidth, nightY + buttonHeight);
+    drawButtonLabel("Night", startX, nightY + buttonHeight / 2, buttonWidth);
+
+    glColor3f(1.0f, 0.0f, 0.0f);
+    glRecti(startX, startY, startX + buttonWidth, startY + buttonHeight);
+    drawButtonLabel("Start Game", startX, startY + buttonHeight / 2, buttonWidth);
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);
 
     glutSwapBuffers();
 }
@@ -98,4 +112,3 @@ void drawMPHDial(float mph) {
     glEnd();
     drawText((velocity >= 0) ? "DRIVE" : "REVERSE", 10, 965);
 }
-

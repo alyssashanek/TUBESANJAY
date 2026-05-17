@@ -112,7 +112,8 @@ void drawStartLight(){
     float colors[4][3] = {{1.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}};
     
     // Main structure and base
-    glColor3f(0.8f, 0.8f, 0.8f);
+    // Main structure and base - warna abu-abu seperti tiang billboard
+    glColor3f(0.40f, 0.42f, 0.45f);
     drawCylinder(300, 40, 0, 180, 40, 0, 2);
     drawCylinder(290, 0, 0, 290, 40, 0, 2);
     drawCylinder(190, 0, 0, 190, 40, 0, 2);
@@ -139,64 +140,84 @@ void drawStartLight(){
     }
 }
 
-void drawTrack(void){
-    // Drawing the floor
-    glColor3f(0.35, 0.35, 0.35);
-    if(day){drawQuads(trackQuads, 9);}
-    else{drawReflectiveQuads(trackQuads, 9);}
-    drawCircles(trackCurves, 9);
-    
-    // Drawing the barriers
-    glColor3f(0.75, 0, 0);
-    drawMultipleBoxes(axisBarriers, axisBarriersCount);
-    drawCircles(curveBarriers, curveBarriersCount);
-    
-    for (int i = 0; i < curveBarriersCount; ++i) {
-        float* barrier = curveBarriers[i];
-        drawCurvedWall(barrier[0], barrier[1], barrier[2], barrier[4], barrier[3], barrier[5], barrier[6]);
+void setCheckerColor(int index) {
+    if (index % 2 == 0) {
+        glColor3f(1.0f, 1.0f, 1.0f); // putih
+    } else {
+        glColor3f(0.0f, 0.0f, 0.0f); // hitam
     }
 }
 
-// Draw curved barrier wall
+void drawTrack(void){
+    glColor3f(0.35, 0.35, 0.35);
+
+    if(day){
+        drawQuads(trackQuads, 9);
+    } else {
+        drawReflectiveQuads(trackQuads, 9);
+    }
+
+    drawCircles(trackCurves, 9);
+
+    for (int i = 0; i < axisBarriersCount; i++) {
+        setCheckerColor(i);
+
+        drawBoxFromCorners(
+            axisBarriers[i][0], axisBarriers[i][1], axisBarriers[i][2],
+            axisBarriers[i][3], axisBarriers[i][4], axisBarriers[i][5]
+        );
+    }
+
+    for (int i = 0; i < curveBarriersCount; ++i) {
+        setCheckerColor(i);
+
+        float* barrier = curveBarriers[i];
+
+        drawCircle(
+            barrier[0], barrier[1], barrier[2],
+            barrier[4], barrier[3],
+            barrier[5], barrier[6]
+        );
+
+        drawCurvedWall(
+            barrier[0], barrier[1], barrier[2],
+            barrier[4], barrier[3],
+            barrier[5], barrier[6]
+        );
+    }
+}
+
 void drawCurvedWall(float cx, float cy, float cz, float innerRadius, float outerRadius, float startAngle, float endAngle) {
     glPushMatrix();
     glTranslatef(cx, cy, cz);
-    glNormal3f(0, 1, 0);
+
+    // Inner wall
     glBegin(GL_TRIANGLE_STRIP);
     for (int i = 0; i <= 50; ++i) {
-        float theta = startAngle + (endAngle - startAngle) * float(i) / float(50); // Current angle
+        float theta = startAngle + (endAngle - startAngle) * float(i) / 50.0f;
         float cosTheta = cosf(theta);
         float sinTheta = sinf(theta);
+
         glNormal3f(-cosTheta, 0.0f, -sinTheta);
-        // Outer vertex
-        float xOuter = innerRadius * cosTheta;
-        float zOuter = innerRadius * sinTheta;
-        glVertex3f(xOuter, 0.0f, zOuter);
-        // Inner vertex
-        float xInner = innerRadius * cosTheta;
-        float zInner = innerRadius * sinTheta;
-        glVertex3f(xInner, -cy, zInner);
+
+        glVertex3f(innerRadius * cosTheta, 0.0f, sinTheta * innerRadius);
+        glVertex3f(innerRadius * cosTheta, -cy,  sinTheta * innerRadius);
     }
     glEnd();
-    glPopMatrix();
-    
-    glPushMatrix();
-    glTranslatef(cx, cy, cz);
+
+    // Outer wall
     glBegin(GL_TRIANGLE_STRIP);
     for (int i = 0; i <= 50; ++i) {
-        float theta = startAngle + (endAngle - startAngle) * float(i) / float(50); // Current angle
+        float theta = startAngle + (endAngle - startAngle) * float(i) / 50.0f;
         float cosTheta = cosf(theta);
         float sinTheta = sinf(theta);
+
         glNormal3f(cosTheta, 0.0f, sinTheta);
-        // Outer vertex
-        float xOuter = outerRadius * cosTheta;
-        float zOuter = outerRadius * sinTheta;
-        glVertex3f(xOuter, 0.0f, zOuter);
-        // Inner vertex
-        float xInner = outerRadius * cosTheta;
-        float zInner = outerRadius * sinTheta;
-        glVertex3f(xInner, -cy, zInner);
+
+        glVertex3f(outerRadius * cosTheta, 0.0f, sinTheta * outerRadius);
+        glVertex3f(outerRadius * cosTheta, -cy,  sinTheta * outerRadius);
     }
     glEnd();
+
     glPopMatrix();
 }

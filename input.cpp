@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <cctype>
+#include <iostream>
 
 #ifdef __APPLE__
 #include <GLUT/glut.h>
@@ -48,8 +49,8 @@ void keyInput(unsigned char key, int x, int y) {
             currentLightRow = -1;
             updateLightSequence(0);
             break;
-        case 27: // ASCII code for the ESC key
-            exit(0);
+        case 27:
+            std::cout << "ESC pressed. Right click to open menu.\n";
             break;
     }
     glutPostRedisplay();
@@ -91,59 +92,78 @@ void specialKeyInput(int key, int x, int y)
     }
     glutPostRedisplay();
 }
+
 void menu(int item) {
     switch(item) {
-        case 1: // Toggle Day/Night
-            day = !day; // Toggle the day variable
-            
-            if(day){glClearColor(0.53f, 0.81f, 0.92f, 1.0f);}
-            else{glClearColor(0.05, 0.05, 0.15, 1.0);}
+        case 1:
+            day = !day;
+
+            if (day) {
+                glClearColor(0.53f, 0.81f, 0.92f, 1.0f);
+            } else {
+                glClearColor(0.05, 0.05, 0.15, 1.0);
+            }
             break;
+
         case 2:
+            gameStarted = false;
+            timerRunning = false;
+            lapStartTime = 0;
+            velocity = 0;
+            currentCheckpoint = 0;
+            break;
+
+        case 3:
+            exit(0);
             break;
     }
-    glutPostRedisplay(); // Redraw the scene to reflect the changes
+
+    glutPostRedisplay();
 }
 
 void mouseInput(int button, int state, int x, int y) {
-    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-        int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
-        int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN && !gameStarted) {
+        int w = glutGet(GLUT_WINDOW_WIDTH);
+        int h = glutGet(GLUT_WINDOW_HEIGHT);
 
-        // Transform y coordinate
-        y = windowHeight - y;  // Adjust for OpenGL's coordinate system (bottom-up)
+        y = h - y;
 
-        // Button dimensions and positions might also need to be scaled
-        int startX = (int)(150 * (windowWidth / 500.0));  // Scale position based on window width
-        int buttonWidth = (int)(200 * (windowWidth / 500.0));  // Scale width
-        int buttonHeight = 50;  // Fixed height (can also scale if necessary)
+        int buttonWidth = w * 0.25;
+        int buttonHeight = 50;
+        int startX = (w - buttonWidth) / 2;
 
-        // Check button boundaries
-        if (x > startX && x < startX + buttonWidth) {
-            if (y > 600 * (windowHeight / 1000.0) && y < (600 * (windowHeight / 1000.0) + buttonHeight)) {
+        int dayY = h * 0.60;
+        int nightY = h * 0.50;
+        int startY = h * 0.40;
+
+        if (x >= startX && x <= startX + buttonWidth) {
+            if (y >= dayY && y <= dayY + buttonHeight) {
                 isDaySelected = true;
                 isNightSelected = false;
                 day = true;
-            } else if (y > 500 * (windowHeight / 1000.0) && y < (500 * (windowHeight / 1000.0) + buttonHeight)) {
+                glClearColor(0.53f, 0.81f, 0.92f, 1.0f);
+            }
+            else if (y >= nightY && y <= nightY + buttonHeight) {
                 isDaySelected = false;
                 isNightSelected = true;
                 day = false;
-            } else if (y > 400 * (windowHeight / 1000.0) && y < (400 * (windowHeight / 1000.0) + buttonHeight)) {
+                glClearColor(0.05f, 0.05f, 0.15f, 1.0f);
+            }
+            else if (y >= startY && y <= startY + buttonHeight) {
                 switchToMainGame();
             }
-            glutPostRedisplay();
         }
+
+        glutPostRedisplay();
     }
 }
 
 void createMenu() {
-    // Create a menu
     int menuId = glutCreateMenu(menu);
 
-    // Add entries to the menu
     glutAddMenuEntry("Toggle Day/Night", 1);
-    glutAddMenuEntry("Other Option", 2);
+    glutAddMenuEntry("Back to Start Menu", 2);
+    glutAddMenuEntry("Exit Game", 3);
 
-    // Attach the menu to the right mouse button
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
