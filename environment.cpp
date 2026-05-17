@@ -180,7 +180,7 @@ void drawSun() {
 
     // Move to the position and draw the sun
     glTranslatef(400, 300, 1000); // Adjust these values based on your scene
-    glColor3f(1.0f, 0.85f, 0.2f); // Sun color
+    glColor3f(1.0f, 0.95f, 0.7f); // Sun color
 
     // Enable emissive material to make the sun glow
     GLfloat mat_emission[] = {1.0f, 0.9f, 0.1f, 1.0f};
