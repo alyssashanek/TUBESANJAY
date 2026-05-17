@@ -19,7 +19,7 @@ bool day = true;
 GLuint textureGrass[1];
 unsigned int textureBillboard[1];
 
-float cloudSpeed = 0.1f;
+float cloudSpeed = 0.05f;
 
 ConfettiParticle confettiCannon1[MAX_CONFETTI];
 ConfettiParticle confettiCannon2[MAX_CONFETTI];

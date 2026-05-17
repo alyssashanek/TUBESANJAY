@@ -180,10 +180,10 @@ void drawSun() {
 
     // Move to the position and draw the sun
     glTranslatef(400, 300, 1000); // Adjust these values based on your scene
-    glColor3f(1.0f, 0.95f, 0.7f); // Sun color
+    glColor3f(1.0f, 0.85f, 0.2f); // Sun color
 
     // Enable emissive material to make the sun glow
-    GLfloat mat_emission[] = {0.9f, 0.8f, 0.2f, 1.0f};
+    GLfloat mat_emission[] = {1.0f, 0.9f, 0.1f, 1.0f};
     glMaterialfv(GL_FRONT, GL_EMISSION, mat_emission);
 
     // Create a quadric object to draw sphere

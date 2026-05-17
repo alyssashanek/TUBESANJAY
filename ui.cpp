@@ -1,5 +1,9 @@
 #include "ui.h"
 #include "globals.h"
+#include "environment.h"
+#include "track.h"
+#include "helpers.h"
+#include "car.h"
 
 #include <cstring>
 #include <cmath>
@@ -24,6 +28,117 @@ void drawStartScreen() {
     int w = glutGet(GLUT_WINDOW_WIDTH);
     int h = glutGet(GLUT_WINDOW_HEIGHT);
 
+        // =========================
+    // 3D BACKGROUND TRACK VIEW
+    // =========================
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+
+    if (isDaySelected) {
+        glClearColor(0.53f, 0.81f, 0.92f, 1.0f);
+
+        GLfloat globalAmbient[] = {0.75f, 0.75f, 0.75f, 1.0f};
+        glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
+
+        GLfloat lightDiffuse[] = {1.0f, 1.0f, 1.0f, 1.0f};
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
+    }
+    else {
+        glClearColor(0.03f, 0.03f, 0.08f, 1.0f);
+
+        GLfloat globalAmbient[] = {0.18f, 0.18f, 0.25f, 1.0f};
+        glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
+
+        GLfloat lightDiffuse[] = {0.35f, 0.35f, 0.45f, 1.0f};
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
+    }
+
+    GLfloat sunlightPos[] = {250.0f, 350.0f, 250.0f, 1.0f};
+    glLightfv(GL_LIGHT0, GL_POSITION, sunlightPos);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    gluPerspective(70.0f, (float)w / (float)h, 1.0f, 3000.0f);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    cameraAngle += 0.18f;
+
+    float radius = 420.0f;
+
+    float camX = sin(cameraAngle * PI / 180.0f) * radius;
+    float camZ = cos(cameraAngle * PI / 180.0f) * radius;
+
+    gluLookAt(
+        camX, 180.0f, camZ,
+        0.0f, 0.0f, -40.0f,
+        0.0f, 1.0f, 0.0f
+    );
+
+    // render semua object
+    drawGrass();
+
+    glEnable(GL_COLOR_MATERIAL);
+
+    drawTrack();
+    drawStartFinishLine();
+    drawStartLight();
+
+    GLfloat treeAmbient[] = {0.25f, 0.25f, 0.25f, 1.0f};
+    GLfloat treeDiffuse[] = {0.6f, 0.6f, 0.6f, 1.0f};
+
+    if (isDaySelected) {
+        treeAmbient[0] = treeAmbient[1] = treeAmbient[2] = 0.5f;
+
+        treeDiffuse[0] = treeDiffuse[1] = treeDiffuse[2] = 1.0f;
+    }
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT, treeAmbient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, treeDiffuse);
+
+    drawTrees();
+    drawClouds();
+    drawBillboard();
+    drawTrophy();
+    drawSun();
+
+    if (!isDaySelected) {
+        drawMoon();
+    }
+
+    // mobil player
+    glPushMatrix();
+
+    // posisi pas di start line
+    glTranslatef(-35.0f, 2.0f, -5.0f);
+
+    // hadap ke lintasan
+    glRotatef(0.0f, 0, 1, 0);
+
+    glScalef(1.15f, 1.15f, 1.15f);
+
+    // MATIIN HEADLIGHT TOTAL
+    glDisable(GL_LIGHT1);
+    glDisable(GL_LIGHT2);
+
+    // paksa mode lampu mati
+    int oldHeadlight = headlightMode;
+    headlightMode = 0;
+
+    drawRacecar();
+
+    headlightMode = oldHeadlight;
+
+    glPopMatrix();
+
+    // =========================
+    // UI OVERLAY
+    // =========================
     glDisable(GL_LIGHTING);
     glDisable(GL_DEPTH_TEST);
 
@@ -34,13 +149,26 @@ void drawStartScreen() {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    glClearColor(0.02f, 0.02f, 0.08f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // overlay gelap transparan
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glColor4f(0.0f, 0.0f, 0.0f, 0.45f);
+
+    glBegin(GL_QUADS);
+        glVertex2f(0, 0);
+        glVertex2f(w, 0);
+        glVertex2f(w, h);
+        glVertex2f(0, h);
+    glEnd();
+
+    glDisable(GL_BLEND);
 
     glColor3f(1.0, 1.0, 1.0);
 
     const char* title = "Select Mode";
     int titleWidth = glutBitmapLength(GLUT_BITMAP_HELVETICA_18, (const unsigned char*)title);
+
     glRasterPos2i((w - titleWidth) / 2, h * 0.80);
 
     for (const char* c = title; *c != '\0'; c++) {
@@ -55,24 +183,27 @@ void drawStartScreen() {
     int nightY = h * 0.50;
     int startY = h * 0.40;
 
-    glColor3f(isDaySelected ? 0.0f : 0.3f, isDaySelected ? 1.0f : 0.6f, 0.0f);
+    glColor3f(isDaySelected ? 0.0f : 0.3f,
+              isDaySelected ? 1.0f : 0.6f,
+              0.0f);
+
     glRecti(startX, dayY, startX + buttonWidth, dayY + buttonHeight);
     drawButtonLabel("Day", startX, dayY + buttonHeight / 2, buttonWidth);
 
-    glColor3f(isNightSelected ? 0.2f : 0.1f, isNightSelected ? 0.2f : 0.1f, isNightSelected ? 1.0f : 0.6f);
+    glColor3f(isNightSelected ? 0.2f : 0.1f,
+              isNightSelected ? 0.2f : 0.1f,
+              isNightSelected ? 1.0f : 0.6f);
+
     glRecti(startX, nightY, startX + buttonWidth, nightY + buttonHeight);
     drawButtonLabel("Night", startX, nightY + buttonHeight / 2, buttonWidth);
 
     glColor3f(1.0f, 0.0f, 0.0f);
     glRecti(startX, startY, startX + buttonWidth, startY + buttonHeight);
-    drawButtonLabel("Start Game", startX, startY + buttonHeight / 2, buttonWidth);
 
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_LIGHTING);
+    drawButtonLabel("Start Game", startX, startY + buttonHeight / 2, buttonWidth);
 
     glutSwapBuffers();
 }
-
 // Routine to draw a bitmap character string.
 void drawText(const char* string, int x, int y) {
     glDisable(GL_LIGHTING);
