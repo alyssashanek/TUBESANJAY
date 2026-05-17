@@ -49,6 +49,8 @@ int lapStartTime = 0;
 int lapEndTime = 0;
 
 float currentLapTime = 0.0f;
+float bestLapTime = 0.0f;
+bool hasBestLapTime = false;
 
 float wheelAngle = 0.0f;
 
@@ -58,7 +60,7 @@ float cameraAngle = 0.0f;
 
 int headlightMode = 3;
 
-float turnSpeed = 0.5f;
+float turnSpeed = 0.75f;
 
 float stepsize = 1.0f;
 float turnsize = 5.0f;

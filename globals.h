@@ -60,6 +60,8 @@ extern int lapStartTime;
 extern int lapEndTime;
 
 extern float currentLapTime;
+extern float bestLapTime;
+extern bool hasBestLapTime;
 
 extern float wheelAngle;
 

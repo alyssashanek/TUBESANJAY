@@ -70,10 +70,16 @@ void setup(void) {
 
 void resize(int w, int h)
 {
+    if (h == 0) h = 1;
+
     glViewport(0, 0, (GLsizei)w, (GLsizei)h);
+
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(120,1,1,1000);
+
+    float aspect = (float)w / (float)h;
+    gluPerspective(70.0, aspect, 1.0, 2000.0);
+
     glMatrixMode(GL_MODELVIEW);
 }
 
@@ -108,7 +114,14 @@ void updateCheckpoint(float x, float z) {
                 timerRunning = false;
                 lapEndTime = glutGet(GLUT_ELAPSED_TIME);
                 float lapTime = (lapEndTime - lapStartTime) / 1000.0f;
-                std::cout << "Lap completed in " << lapTime << " seconds.\n";
+
+                if (!hasBestLapTime || lapTime < bestLapTime) {
+                    bestLapTime = lapTime;
+                    hasBestLapTime = true;
+                    std::cout << "New best lap: " << bestLapTime << " seconds.\n";
+                } else {
+                    std::cout << "Lap completed in " << lapTime << " seconds.\n";
+                }
                 currentLightRow = -1;
             }
             break;
@@ -201,14 +214,19 @@ void update(int value) {
     }
 
     // Define the maximum wheel angle
-    const float maxWheelAngle = 25.0f;
-    const float wheelAngleStep = 5.0f;  // Adjust this to control the smoothness
+    const float maxWheelAngle = 35.0f;
+    const float wheelAngleStep = 6.5f;
 
     // Handling turning while moving
     if (velocity != 0 && lapStartTime) {
-        float turnAdjustment = (fabs(velocity) <= 2) ?
-            (turnSpeed * 1.4 * (velocity > 0 ? 1 : -1)) :
-            (turnSpeed * (1.8 - 0.3 * (fabs(velocity) / maxVelocity)) * (velocity > 0 ? 1 : -1));
+        float speedFactor = fabs(velocity) / maxVelocity;
+    float steeringPower = 2.2f - (0.7f * speedFactor);
+
+    if (steeringPower < 1.25f) {
+        steeringPower = 1.25f;
+    }
+
+    float turnAdjustment = turnSpeed * steeringPower * (velocity > 0 ? 1 : -1);
 
         if (keyStates['a']) { // Turn left
             angleX += turnAdjustment;
@@ -235,15 +253,12 @@ void update(int value) {
     float proposedMeX = meX + velocity * sin(angleX * PI / 180);
     if (!isInsideAnyBox(proposedMeX, proposedMeZ, axisBarriers, axisBarriersCount) &&
         !isInsideAnyCircle(proposedMeX, proposedMeZ, curveBarriers, curveBarriersCount)) {
-        // If not inside any box, update the position
         meZ = proposedMeZ;
         meX = proposedMeX;
     } else {
-        // Collision detected, apply bounce back
-        float elasticity = 0.25; // Coefficient of how much velocity is preserved after the bounce
-        velocity = -velocity * elasticity; // Reverse and reduce velocity
+        float elasticity = 0.25;
+        velocity = -velocity * elasticity;
 
-        // Recalculate position using adjusted velocity
         meZ += velocity * cos(angleX * PI / 180);
         meX += velocity * sin(angleX * PI / 180);
     }
@@ -269,8 +284,25 @@ void update(int value) {
     updateCheckpoint(meX, meZ);
 }
 
-void drawScene(void)
-{
+void drawScene(void){
+    if (!gameStarted) {
+        drawStartScreen();
+        return;
+    }
+
+    int w = glutGet(GLUT_WINDOW_WIDTH);
+    int h = glutGet(GLUT_WINDOW_HEIGHT);
+    if (h == 0) h = 1;
+
+    glViewport(0, 0, w, h);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(100.0, (float)w / (float)h, 1.0, 2000.0);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
     if(day) {
         glClearColor(0.53f, 0.81f, 0.92f, 1.0f);
     } else {
@@ -283,51 +315,34 @@ void drawScene(void)
     float baseCameraX, baseCameraY, baseCameraZ;
     float targetX, targetY, targetZ;
 
-    if (!gameStarted) {
-        // Camera rotates around the origin at a radius of 200
-        baseCameraX = 300 * cos(cameraAngle);
-        baseCameraZ = 300 * sin(cameraAngle);
-        baseCameraY = 100;  // Fixed height above the origin
+    float cameraDistance = fpv ? 0.1f : 90.0f;
+    float cameraHeight = fpv ? 10.0f : 35.0f;
+    float sideOffset = 70.0f;
 
-        targetX = 0;  // Looking at the origin
-        targetY = 0;
-        targetZ = 0;
+    baseCameraX = meX - cameraDistance * sin(angleX * PI / 180);
+    baseCameraZ = meZ - cameraDistance * cos(angleX * PI / 180);
+    baseCameraY = meY + cameraHeight;
 
-        cameraAngle += 0.005;  // Increment the angle for smooth rotation
-        
-        setOrthographicProjection();
-        renderCenteredText("Furiosa Racing");
-        resetPerspectiveProjection();
-    } else {
-        // Standard game camera logic
-        float cameraDistance = fpv ? 0.1 : 50; // Distance behind the car
-        float cameraHeight = fpv ? 10 : 50;   // Height above the car
-        float sideOffset = 50.0f;     // Distance to the side of the car for side views
+    targetX = meX;
+    targetY = meY + 10;
+    targetZ = meZ;
 
-        baseCameraX = meX - cameraDistance * sin(angleX * PI / 180);
-        baseCameraZ = meZ - cameraDistance * cos(angleX * PI / 180);
-        baseCameraY = meY + cameraHeight;
-
-        targetX = meX;  // Car's current position
-        targetY = meY + 10;
-        targetZ = meZ;
-
-        if (lookBehind) {
-            baseCameraX = meX + cameraDistance * sin(angleX * PI / 180);
-            baseCameraZ = meZ + cameraDistance * cos(angleX * PI / 180);
-        } else if (lookLeft) {
-            baseCameraX = meX + sideOffset * cos(angleX * PI / 180);
-            baseCameraZ = meZ - sideOffset * sin(angleX * PI / 180);
-        } else if (lookRight) {
-            baseCameraX = meX - sideOffset * cos(angleX * PI / 180);
-            baseCameraZ = meZ + sideOffset * sin(angleX * PI / 180);
-        }
+    if (lookBehind) {
+        baseCameraX = meX + cameraDistance * sin(angleX * PI / 180);
+        baseCameraZ = meZ + cameraDistance * cos(angleX * PI / 180);
+    } else if (lookLeft) {
+        baseCameraX = meX + sideOffset * cos(angleX * PI / 180);
+        baseCameraZ = meZ - sideOffset * sin(angleX * PI / 180);
+    } else if (lookRight) {
+        baseCameraX = meX - sideOffset * cos(angleX * PI / 180);
+        baseCameraZ = meZ + sideOffset * sin(angleX * PI / 180);
     }
 
-    // Setup the camera
-    gluLookAt(baseCameraX, baseCameraY, baseCameraZ, // Camera position
-              targetX, targetY, targetZ, // Look at point
-              0.0f, 1.0f, 0.0f); // Up vector
+gluLookAt(
+    baseCameraX, baseCameraY, baseCameraZ,
+    targetX, targetY, targetZ,
+    0.0f, 1.0f, 0.0f
+);
 
     drawGrass();
     drawBillboard();
@@ -354,28 +369,38 @@ void drawScene(void)
         resetPerspectiveProjection();
     }
 
-    if (currentCheckpoint > 6){
-        updateAndDrawConfetti(confettiCannon1);
-        updateAndDrawConfetti(confettiCannon2);
-        
-        char lapTimeText[100]; // Buffer for lap time text
-        float lapTime = (lapEndTime - lapStartTime) / 1000.0f;
-        sprintf(lapTimeText, "Lap completed in %.2f seconds.", lapTime);
-        setOrthographicProjection();  // Switch to 2D projection
-        drawText(lapTimeText, 10, 50);  // Draw text on the screen
-        drawText("Press 'r' to restart.", 10, 70);  // Draw text on the screen
-        resetPerspectiveProjection();  // Switch back to your 3D projection
+    if (currentCheckpoint > 6) {
+    updateAndDrawConfetti(confettiCannon1);
+    updateAndDrawConfetti(confettiCannon2);
+
+    char lapTimeText[100];
+    float lapTime = (lapEndTime - lapStartTime) / 1000.0f;
+    sprintf(lapTimeText, "Lap completed in %.2f seconds.", lapTime);
+
+    setOrthographicProjection();
+
+    int startX = 10;
+    int startY = 50;
+    int lineGap = 30;
+
+    drawText(lapTimeText, startX, startY);
+
+    char bestLapText[100];
+    if (hasBestLapTime) {
+        sprintf(bestLapText, "Best Lap: %.2f seconds", bestLapTime);
+    } else {
+        sprintf(bestLapText, "Best Lap: --");
     }
 
-    if(!fpv){ // Third person view dials
-        setOrthographicProjection();
-        float mph = velocity * 25;
-        drawMPHDial(mph); // Draw the MPH dial
-        resetPerspectiveProjection();
-    }
+    drawText(bestLapText, startX, startY + lineGap);
+    drawText("Press 'r' to restart.", startX, startY + lineGap * 2);
+
+    resetPerspectiveProjection();
+}
 
     glutSwapBuffers();
 }
+
 /*\ -------------------------- \*/
 /*\ - Initialization Routine - \*/
 void updateLightSequence(int value) {
@@ -402,18 +427,10 @@ void startScreenResize(int w, int h) {
 }
 
 void globalTimer(int value) {
-    if(!gameStarted){
-        // Post redisplay for the start window
-        glutSetWindow(startWindow);
-        glutPostRedisplay();
-        
-        // Post redisplay for the main game window
-        glutSetWindow(mainWindow);
-        glutPostRedisplay();
-        
-        // Re-register the timer callback to keep the updates coming
-        glutTimerFunc(16, globalTimer, 0); // Approximately 60 times per second
-    }
+    glutSetWindow(mainWindow);
+    glutPostRedisplay();
+
+    glutTimerFunc(16, globalTimer, 0);
 }
 
 void idle() {
@@ -469,21 +486,24 @@ void printInteraction(void) {
 }
 
 void switchToMainGame() {
-    
-    glutSetWindow(startWindow);
-    glutHideWindow();
-
     glutSetWindow(mainWindow);
-    glutShowWindow();
-    
-    meX=240, meY=0, meZ=-40, angleX=0, angleY = (headlightMode == 2 ? -1 : -1.25);
+
+    meX = 240;
+    meY = 0;
+    meZ = -40;
+
+    angleX = 0;
+    angleY = (headlightMode == 2 ? -1 : -1.25);
+
     currentCheckpoint = 0;
     timerRunning = false;
     lapStartTime = 0;
     velocity = 0;
+
     currentLightRow = -1;
     updateLightSequence(0);
+
     gameStarted = true;
-    
+
     glutPostRedisplay();
 }
