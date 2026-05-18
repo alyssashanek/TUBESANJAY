@@ -65,7 +65,7 @@ extern bool hasBestLapTime;
 
 extern float wheelAngle;
 
-extern float teapotRotationAngle;
+extern float trophyRotationAngle;
 
 extern float cameraAngle;
 

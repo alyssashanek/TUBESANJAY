@@ -54,7 +54,7 @@ bool hasBestLapTime = false;
 
 float wheelAngle = 0.0f;
 
-float teapotRotationAngle = 0.0f;
+float trophyRotationAngle = 0.0f;
 
 float cameraAngle = 0.0f;
 

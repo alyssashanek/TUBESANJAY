@@ -278,7 +278,7 @@ void drawTrophy(void) {
 
     // Posisi dan Rotasi
     glTranslatef(0.0f, 0.0f, 0.0f);
-    glRotatef(teapotRotationAngle, 0, 1, 0);
+    glRotatef(trophyRotationAngle, 0, 1, 0);
 
     GLUquadric* quad = gluNewQuadric();
     gluQuadricNormals(quad, GLU_SMOOTH); // Memastikan cahaya jatuh dengan halus

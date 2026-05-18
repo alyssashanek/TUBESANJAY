@@ -286,4 +286,3 @@ void glShadowProjection(GLfloat shadowMat[16], GLfloat lightPos[4], GLfloat plan
     shadowMat[11] = 0.f - lightPos[3] * plane[2];
     shadowMat[15] = dot - lightPos[3] * plane[3];
 }
-/*\ -------------------------- \*/

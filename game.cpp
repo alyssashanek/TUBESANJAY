@@ -273,9 +273,10 @@ void update(int value) {
                 cloudPositions[i].z = -25.0;
             }
         }
-        teapotRotationAngle += 2.0f; // Increase the angle by 2 degrees each frame
-        if (teapotRotationAngle > 360.0f) {
-            teapotRotationAngle -= 360.0f; // Wrap around at 360 degrees
+            trophyRotationAngle += 2.0f;
+
+        if (trophyRotationAngle > 360.0f) {
+            trophyRotationAngle -= 360.0f;
         }
     }
     glutPostRedisplay(); // Redraw the scene
@@ -443,9 +444,11 @@ void idle() {
             cloudPositions[i].z = -25.0;
         }
     }
-    teapotRotationAngle += 2.0f; // Increase the angle by 2 degrees each frame
-    if (teapotRotationAngle > 360.0f) {
-        teapotRotationAngle -= 360.0f; // Wrap around at 360 degrees
+
+    trophyRotationAngle += 2.0f;
+
+    if (trophyRotationAngle > 360.0f) {
+        trophyRotationAngle -= 360.0f;
     }
     glutPostRedisplay();
 }
