@@ -2,7 +2,6 @@
 // ./racingf.exe
 #include <windows.h>
 #include <mmsystem.h>
-
 #include "globals.h"
 #include "helpers.h"
 #include "environment.h"
@@ -15,7 +14,7 @@
 void createMainWindow() {
     glutInitWindowSize(1000, 1000);
     glutInitWindowPosition(0, 0);
-    mainWindow = glutCreateWindow("OpenGL Racing Simulator");
+    mainWindow = glutCreateWindow("FURIOSA RACING");
 
     setup();
     createMenu();
@@ -36,7 +35,6 @@ void createMainWindow() {
     }
 }
 
-/*\ -------------------------- \*/
 // Main routine.
 int main(int argc, char **argv) {
     printInteraction();
