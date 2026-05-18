@@ -259,11 +259,7 @@ void resetPerspectiveProjection() {
     glMatrixMode(GL_MODELVIEW);
 }
 
-void glShadowProjection(
-    GLfloat shadowMat[16],
-    GLfloat lightPos[4],
-    GLfloat plane[4]
-) {
+void glShadowProjection(GLfloat shadowMat[16], GLfloat lightPos[4], GLfloat plane[4]) {
     GLfloat dot =
         plane[0] * lightPos[0] +
         plane[1] * lightPos[1] +
