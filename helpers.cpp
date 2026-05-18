@@ -258,4 +258,36 @@ void resetPerspectiveProjection() {
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
 }
+
+void glShadowProjection(
+    GLfloat shadowMat[16],
+    GLfloat lightPos[4],
+    GLfloat plane[4]
+) {
+    GLfloat dot =
+        plane[0] * lightPos[0] +
+        plane[1] * lightPos[1] +
+        plane[2] * lightPos[2] +
+        plane[3] * lightPos[3];
+
+    shadowMat[0]  = dot - lightPos[0] * plane[0];
+    shadowMat[4]  = 0.f - lightPos[0] * plane[1];
+    shadowMat[8]  = 0.f - lightPos[0] * plane[2];
+    shadowMat[12] = 0.f - lightPos[0] * plane[3];
+
+    shadowMat[1]  = 0.f - lightPos[1] * plane[0];
+    shadowMat[5]  = dot - lightPos[1] * plane[1];
+    shadowMat[9]  = 0.f - lightPos[1] * plane[2];
+    shadowMat[13] = 0.f - lightPos[1] * plane[3];
+
+    shadowMat[2]  = 0.f - lightPos[2] * plane[0];
+    shadowMat[6]  = 0.f - lightPos[2] * plane[1];
+    shadowMat[10] = dot - lightPos[2] * plane[2];
+    shadowMat[14] = 0.f - lightPos[2] * plane[3];
+
+    shadowMat[3]  = 0.f - lightPos[3] * plane[0];
+    shadowMat[7]  = 0.f - lightPos[3] * plane[1];
+    shadowMat[11] = 0.f - lightPos[3] * plane[2];
+    shadowMat[15] = dot - lightPos[3] * plane[3];
+}
 /*\ -------------------------- \*/

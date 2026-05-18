@@ -391,6 +391,12 @@ void loadBillboardTexture() {
 }
 
 void drawBillboard(void) {
+    GLfloat lightPos[4];
+    glGetLightfv(GL_LIGHT0, GL_POSITION, lightPos);
+    GLfloat groundPlane[] = {0.0f, 1.0f, 0.0f, 0.0f};
+    GLfloat shadowMat[16];
+    glShadowProjection(shadowMat, lightPos, groundPlane);
+
     float bx     = 325.0f;
     float bz     = -60.0f;
     float poleH  = 18.0f;
@@ -445,4 +451,46 @@ void drawBillboard(void) {
 
     glDisable(GL_TEXTURE_2D);
     glEnable(GL_LIGHTING);
+
+    // shadow billboard
+    glPushMatrix();
+
+    glDisable(GL_LIGHTING);
+    glDisable(GL_TEXTURE_2D);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glColor4f(0.0f, 0.0f, 0.0f, 0.35f);
+
+    // biar ga z-fighting sama tanah
+    glTranslatef(0.0f, 0.05f, 0.0f);
+
+    glMultMatrixf(shadowMat);
+
+    // shadow tiang
+    drawCylinder(bx + 2.0f, 0, bz - halfW * 0.55f,
+                 bx + 2.0f, poleH + boardH + 1.5f,
+                 bz - halfW * 0.55f, 1.8f);
+
+    drawCylinder(bx + 2.0f, 0, bz + halfW * 0.55f,
+                 bx + 2.0f, poleH + boardH + 1.5f,
+                 bz + halfW * 0.55f, 1.8f);
+
+    // shadow papan billboard
+    drawBoxFromCorners(
+        bx + 0.6f,
+        boardY,
+        bz - halfW,
+
+        bx + 2.5f,
+        boardY + boardH,
+        bz + halfW
+    );
+
+    glDisable(GL_BLEND);
+
+    glEnable(GL_LIGHTING);
+
+    glPopMatrix();
 }

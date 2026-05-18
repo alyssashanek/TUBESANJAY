@@ -2,6 +2,13 @@
 #define HELPERS_H
 
 #include <string>
+
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#else
+#include <GL/glut.h>
+#endif
+
 #include "structs.h"
 
 BitMapFile *getBMPData(std::string filename);
@@ -59,5 +66,11 @@ void writeStrokeString(void *font, const char *string);
 void setOrthographicProjection();
 
 void resetPerspectiveProjection();
+
+void glShadowProjection(
+    GLfloat shadowMat[16],
+    GLfloat lightPos[4],
+    GLfloat plane[4]
+);
 
 #endif
