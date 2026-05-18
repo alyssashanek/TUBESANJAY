@@ -1,6 +1,7 @@
-// cd /d/Programming/GTI/"Tugas Besar - Parts"
-// g++ main.cpp car.cpp environment.cpp game.cpp globals.cpp helpers.cpp input.cpp track.cpp ui.cpp -o racingf -lfreeglut -lopengl32 -lglu32
-// ./racingf
+// g++ main.cpp globals.cpp helpers.cpp environment.cpp track.cpp car.cpp ui.cpp input.cpp game.cpp -o racingf.exe -lfreeglut -lopengl32 -lglu32 -lwinmm
+// ./racingf.exe
+#include <windows.h>
+#include <mmsystem.h>
 
 #include "globals.h"
 #include "helpers.h"
@@ -37,14 +38,12 @@ void createMainWindow() {
 
 /*\ -------------------------- \*/
 // Main routine.
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
     printInteraction();
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-    
     createMainWindow();
-
+    PlaySound(TEXT("music/tokyodrift.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
     glutMainLoop();
     return 0;
 }
