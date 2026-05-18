@@ -450,39 +450,40 @@ void idle() {
     glutPostRedisplay();
 }
 
-// Routine to output interaction instructions to the C++ window.
+// Routine untuk menampilkan instruksi interaksi pada window C++.
 void printInteraction(void) {
-    cout << "Interaction Instructions:" << endl;
-    cout << "General Controls:" << endl;
-    cout << "\tESC - Exit the game." << endl;
-    cout << "\tR - Reset the game state, repositioning the vehicle and resetting lap timing and velocity." << endl;
-    
-    cout << "Movement Controls:" << endl;
-    cout << "\tW - Accelerate the vehicle. Speed increases until it reaches a maximum limit." << endl;
-    cout << "\tS - Decelerate or reverse the vehicle. Speed decreases, and the vehicle can move backward." << endl;
-    cout << "\tA - Steer left. Adjusts the wheel angle to the left, up to a maximum angle." << endl;
-    cout << "\tD - Steer right. Adjusts the wheel angle to the right, down to a minimum angle." << endl;
+    cout << "Petunjuk Kontrol Permainan:" << endl;
 
-    cout << "Camera and View Controls:" << endl;
-    cout << "\tC - Toggle rear view (look behind)." << endl;
-    cout << "\tQ - Look left without changing the direction of movement." << endl;
-    cout << "\tE - Look right without changing the direction of movement." << endl;
-    cout << "\tX - Toggle between first-person view (FPV) and third-person view." << endl;
+    cout << "Kontrol Umum:" << endl;
+    cout << "\tESC - Keluar dari permainan." << endl;
+    cout << "\tR - Reset permainan, mengembalikan posisi mobil serta mengatur ulang timer lap dan kecepatan." << endl;
 
-    cout << "Miscellaneous Controls:" << endl;
-    cout << "\tH - Cycle through different headlight modes: Auto, Off, Low, High." << endl;
+    cout << "Kontrol Pergerakan:" << endl;
+    cout << "\tW - Menambah kecepatan mobil." << endl;
+    cout << "\tS - Mengurangi kecepatan atau mundur." << endl;
+    cout << "\tA - Belok ke kiri." << endl;
+    cout << "\tD - Belok ke kanan." << endl;
 
-    cout << "Stepping Controls (stepping through walls):" << endl;
-    cout << "\tArrow Up - Move forward relative to the vehicle’s current direction." << endl;
-    cout << "\tArrow Down - Move backward relative to the vehicle’s current direction." << endl;
+    cout << "Kontrol Kamera dan Pandangan:" << endl;
+    cout << "\tC - Melihat ke belakang." << endl;
+    cout << "\tQ - Melihat ke kiri tanpa mengubah arah mobil." << endl;
+    cout << "\tE - Melihat ke kanan tanpa mengubah arah mobil." << endl;
+    cout << "\tX - Mengganti tampilan First Person View (FPV) dan Third Person View." << endl;
 
-    cout << "Steering Controls:" << endl;
-    cout << "\tArrow Left - Rotate the vehicle’s view left without moving." << endl;
-    cout << "\tArrow Right - Rotate the vehicle’s view right without moving." << endl;
+    cout << "Kontrol Lampu:" << endl;
+    cout << "\tH - Mengganti mode lampu mobil: Auto, Mati, Low Beam, dan High Beam." << endl;
 
-    cout << "Mouse Controls:" << endl;
-    cout << "\tLeft click start window to select options and start the game." << endl;
-    cout << "\tRight click gameplay window to use popup menu and change day/night settings." << endl;
+    cout << "Kontrol Tambahan (Menembus Tembok):" << endl;
+    cout << "\tPanah Atas - Bergerak maju mengikuti arah mobil." << endl;
+    cout << "\tPanah Bawah - Bergerak mundur mengikuti arah mobil." << endl;
+
+    cout << "Kontrol Arah Pandang:" << endl;
+    cout << "\tPanah Kiri - Memutar arah pandang ke kiri tanpa bergerak." << endl;
+    cout << "\tPanah Kanan - Memutar arah pandang ke kanan tanpa bergerak." << endl;
+
+    cout << "Kontrol Mouse:" << endl;
+    cout << "\tKlik kiri pada start window untuk memilih mode dan memulai permainan." << endl;
+    cout << "\tKlik kanan saat bermain untuk membuka menu popup dan mengganti mode siang/malam." << endl;
 }
 
 void switchToMainGame() {

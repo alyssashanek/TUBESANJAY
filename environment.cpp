@@ -94,10 +94,12 @@ void drawClouds() {
     }
     glEnable(GL_LIGHTING);
 }
+
 void drawHill(float x, float y, float z, float scale) {
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, textureGrass[0]);
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, day ? GL_REPLACE : GL_MODULATE);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
     glPushMatrix();
     glTranslatef(x, y, z);
@@ -117,6 +119,7 @@ void drawHill(float x, float y, float z, float scale) {
     glPopMatrix();
     glDisable(GL_TEXTURE_2D);
 }
+
 void drawTree(float x, float y, float z, float trunkHeight, float foliageRadius) {
     float trunkRadius = 3;  // Radius of the trunk
     float foliageHeight = 20.0f; // Height of the foliage
