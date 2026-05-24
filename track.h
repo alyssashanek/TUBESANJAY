@@ -11,15 +11,7 @@ void drawStartLight();
 void drawTrack();
 
 // bikin dinding tikungan melengkung
-void drawCurvedWall(
-    float cx,
-    float cy,
-    float cz,
-    float innerRadius,
-    float outerRadius,
-    float startAngle,
-    float endAngle
-);
+void drawCurvedWall(float cx, float cy, float cz, float innerRadius, float outerRadius, float startAngle, float endAngle);
 
 // data koordinat pembatas lurus
 extern float axisBarriers[][6];

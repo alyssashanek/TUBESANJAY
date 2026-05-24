@@ -11,6 +11,7 @@
 #include "input.h"
 #include "game.h"
 
+// window utama game
 void createMainWindow() {
     glutInitWindowSize(1000, 1000);
     glutInitWindowPosition(0, 0);
@@ -35,7 +36,7 @@ void createMainWindow() {
     }
 }
 
-// Main routine.
+// main program
 int main(int argc, char **argv) {
     printInteraction();
     glutInit(&argc, argv);
