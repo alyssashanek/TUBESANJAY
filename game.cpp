@@ -609,26 +609,6 @@ void updateLightSequence(int value) {
     }
 }
 
-// Mengatur ukuran start screen saat window diresize
-void startScreenResize(int w, int h) {
-    // Mencegah pembagian dengan nol
-    if (h == 0) {
-        h = 1;
-    }
-
-    // Area render sesuai ukuran window
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-
-    // Setup proyeksi 2D untuk start screen
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-
-    // Menyesuaikan ukuran window
-    gluOrtho2D(0.0, w, 0.0, h);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-}
-
 // Timer global game
 void globalTimer(int value) {
 
