@@ -9,9 +9,12 @@
 #include <GL/glut.h>
 #endif
 
-/*\ --- Coordinate Arrays ---- \*/
+// jumlah pembatas lurus
 int axisBarriersCount = 18;
-float axisBarriers[][6] = { // Track along-axis barrier coordinates
+
+// koordinat pembatas lurus track
+float axisBarriers[][6] = { 
+    // format: x1, y1, z1, x2, y2, z2
     {-75, 0, -320, -200, 2.5, -325},
     {-80, 0, -112.5, -75, 2.5, -320},
     {-200, 0, -325, -205, 2.5, 200},
@@ -31,8 +34,13 @@ float axisBarriers[][6] = { // Track along-axis barrier coordinates
     {240, 0, -322.5, 75, 2.5, -317.5},
     {240, 0, -322.5, 75, 2.5, -317.5},
 };
+
+// jumlah pembatas tikungan
 int curveBarriersCount = 13;
-float curveBarriers[][7] = { // Track curved barrier coordinates
+
+// koordinat pembatas melengkung
+float curveBarriers[][7] = {
+    // format: centerX, centerY, centerZ, outerRadius, innerRadius, sudut awal, sudut akhir
     {80, 2.5, 280, 120, 115, 0, PI},
     {80, 2.5, 280, 45, 40, 0, PI},
     {-40, 2.5, 280, 80, 75, 3 * PI / 2, 2 * PI},
@@ -47,7 +55,9 @@ float curveBarriers[][7] = { // Track curved barrier coordinates
     {80, 2.5, -240, 5, 0, 3 * PI / 2, 2 * PI},
     {160, 2.5, -240, 5, 0, PI / 2, 3 * PI / 2},
 };
-float trackQuads[][5][3] = { // Track quad coordinates
+
+// bagian track lurus berbentuk quad
+float trackQuads[][5][3] = {
     {{280, 0, -160}, {280, 0, 120}, {200, 0, 120}, {200, 0, -160}, {0, 1, 0}},
     {{200, 0, 200}, {200, 0, 280}, {120, 0, 280}, {120, 0, 200}, {0, 1, 0}},
     {{280, 0, -160}, {280, 0, 120}, {200, 0, 120}, {200, 0, -160}, {0, 1, 0}},
@@ -58,7 +68,10 @@ float trackQuads[][5][3] = { // Track quad coordinates
     {{200, 0, -240}, {200, 0, -160}, {160, 0, -160}, {160, 0, -240}, {0, 1, 0}},
     {{-80, 0, -240}, {-80, 0, -120}, {80, 0, -120}, {80, 0, -240}, {0, 1, 0}},
 };
-float trackCurves[][7] = { // Track curve coordinates
+
+// data track tikungan
+// format: centerX, centerY, centerZ, outerRadius, innerRadius, sudut awal, sudut akhir
+float trackCurves[][7] = {
     {80, 0, 280, 120, 40, 0, PI},
     {-40, 0, 280, 80, 0, 3 * PI / 2, 2 * PI},
     {-200, 0, 200, 80, 0, PI / 2, PI},
@@ -70,95 +83,135 @@ float trackCurves[][7] = { // Track curve coordinates
     {200, 0, 200, 80, 0, PI, 3 * PI / 2},
 };
 
+// gambar garis start dan finish
 void drawStartFinishLine(void) {
-    int numSegments = 20;  // Number of checkered segments
+    int numSegments = 20; 
     float segmentLength = (280.0f - 200.0f) / numSegments;
-    float startY = -5.0f;  // Starting y-coordinate for the checkered pattern
-    float stripeHeight = 5.0f;  // Height of each stripe
+    float startY = -5.0f;  
+    float stripeHeight = 5.0f; 
 
     glDisable(GL_LIGHTING);
     glBegin(GL_QUADS);
-    for (int j = 0; j < 2; j++) {  // Two rows of checkered patterns
+
+    // bikin pola checker 2 baris
+    for (int j = 0; j < 2; j++) { 
         for (int i = 0; i < numSegments; ++i) {
-            // Set color: alternate between white (1, 1, 1) and black (0, 0, 0)
+            
+            // warna hitam putih selang-seling
             if ((i + j) % 2 == 0) {
-                glColor3f(1.0f, 1.0f, 1.0f); // White
+                glColor3f(1.0f, 1.0f, 1.0f);
             } else {
-                glColor3f(0.0f, 0.0f, 0.0f); // Black
+                glColor3f(0.0f, 0.0f, 0.0f);
             }
             
-            // Calculate the left and right x-coordinates for the current segment
+            // hitung posisi kiri kanan kotak
             float leftX = 280.0f - segmentLength * i;
             float rightX = leftX - segmentLength;
             
-            // Draw one segment of the start/finish line
-            glVertex3f(leftX, 0.5f, startY + j * stripeHeight);  // Top left
-            glVertex3f(rightX, 0.5f, startY + j * stripeHeight); // Top right
-            glVertex3f(rightX, 0.5f, startY + stripeHeight + j * stripeHeight);  // Bottom right
-            glVertex3f(leftX, 0.5f, startY + stripeHeight + j * stripeHeight);   // Bottom left
+            // gambar satu kotak checker
+            glVertex3f(leftX, 0.5f, startY + j * stripeHeight); 
+            glVertex3f(rightX, 0.5f, startY + j * stripeHeight);
+            glVertex3f(rightX, 0.5f, startY + stripeHeight + j * stripeHeight);  
+            glVertex3f(leftX, 0.5f, startY + stripeHeight + j * stripeHeight); 
         }
     }
-    glEnd(); // End drawing
+    glEnd();
     glEnable(GL_LIGHTING);
 }
+
+// lampu countdown sebelum balapan mulai
 void drawStartLight(){
+    // posisi dasar lampu
     float baseX = 252.5f;
     float baseY = 32.0f;
     float baseZ = -3.1f;
+
+    // jarak antar lampu
     float yIncrement = 3.0f;
     float xDecrement = 5.0f;
+
+    // jumlah lampu per baris
     int numLightsPerRow = 6;
+
+    // ukuran lampu
     float radius = 1.4f;
-    float colors[4][3] = {{1.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}};
+
+    // warna tiap baris
+    float colors[4][3] = {
+        {1.0f, 0.0f, 0.0f}, 
+        {1.0f, 0.0f, 0.0f}, 
+        {1.0f, 1.0f, 0.0f}, 
+        {0.0f, 1.0f, 0.0f}
+    };
     
-    // Main structure and base
-    // Main structure and base - warna abu-abu seperti tiang billboard
+    // tiang utama lampu start
     glColor3f(0.40f, 0.42f, 0.45f);
     drawCylinder(300, 40, 0, 180, 40, 0, 2);
     drawCylinder(290, 0, 0, 290, 40, 0, 2);
     drawCylinder(190, 0, 0, 190, 40, 0, 2);
+
+    // box tempat lampu
     glColor3f(0, 0, 0);
     drawBoxFromCorners(225, 43, -2, 255, 30, -3);
     
-    // Lights
+    // render lampu satu-satu
     for (int row = 0; row < 4; row++) {
         for (int i = 0; i < numLightsPerRow; i++) {
             float currentX = baseX - i * xDecrement;
             float currentY = baseY + row * yIncrement;
+
+            // cover lampu
             glColor3f(0.3, 0.3, 0.3);
-            drawAngledSliceCylinder(currentX, currentY, -5.1); // Shade cover
+            drawAngledSliceCylinder(currentX, currentY, -5.1);
+
+            // nyalain lampu sesuai countdown
             if (row <= currentLightRow) {
-                GLfloat emissive[] = {colors[row][0], colors[row][1], colors[row][2], 1.0f};
+                GLfloat emissive[] = {
+                    colors[row][0], 
+                    colors[row][1], 
+                    colors[row][2], 1.0f
+                };
                 glMaterialfv(GL_FRONT, GL_EMISSION, emissive);
             }
-            glColor3fv(colors[row]); // Light color
+
+            // warna lampu
+            glColor3fv(colors[row]);
             glNormal3f(0, 0, 1);
-            drawCircleXY(currentX, currentY, baseZ, radius); // Actual light
+
+            // gambar lampu
+            drawCircleXY(currentX, currentY, baseZ, radius);
+
+            // balikin efek cahaya ke normal
             GLfloat nonEmissive[] = {0.0f, 0.0f, 0.0f, 1.0f};
             glMaterialfv(GL_FRONT, GL_EMISSION, nonEmissive);
         }
     }
 }
 
+// warna checker pembatas
 void setCheckerColor(int index) {
     if (index % 2 == 0) {
-        glColor3f(1.0f, 1.0f, 1.0f); // putih
+        glColor3f(1.0f, 0.0f, 0.0f);
     } else {
-        glColor3f(0.0f, 0.0f, 0.0f); // hitam
+        glColor3f(0.0f, 0.0f, 0.0f);
     }
 }
 
+// render semua bagian track
 void drawTrack(void){
     glColor3f(0.35, 0.35, 0.35);
 
+    // siang biasa, malam reflektif
     if(day){
         drawQuads(trackQuads, 9);
     } else {
         drawReflectiveQuads(trackQuads, 9);
     }
 
+    // gambar tikungan track
     drawCircles(trackCurves, 9);
 
+    // render pembatas lurus
     for (int i = 0; i < axisBarriersCount; i++) {
         setCheckerColor(i);
 
@@ -168,6 +221,7 @@ void drawTrack(void){
         );
     }
 
+    // render pembatas tikungan
     for (int i = 0; i < curveBarriersCount; ++i) {
         setCheckerColor(i);
 
@@ -187,11 +241,19 @@ void drawTrack(void){
     }
 }
 
-void drawCurvedWall(float cx, float cy, float cz, float innerRadius, float outerRadius, float startAngle, float endAngle) {
+// bikin dinding melengkung di tikungan
+void drawCurvedWall(float cx, 
+    float cy, 
+    float cz, 
+    float innerRadius, 
+    float outerRadius, 
+    float startAngle, 
+    float endAngle
+) {
     glPushMatrix();
     glTranslatef(cx, cy, cz);
 
-    // Inner wall
+    // dinding bagian dalam
     glBegin(GL_TRIANGLE_STRIP);
     for (int i = 0; i <= 50; ++i) {
         float theta = startAngle + (endAngle - startAngle) * float(i) / 50.0f;
@@ -205,7 +267,7 @@ void drawCurvedWall(float cx, float cy, float cz, float innerRadius, float outer
     }
     glEnd();
 
-    // Outer wall
+    // dinding luar
     glBegin(GL_TRIANGLE_STRIP);
     for (int i = 0; i <= 50; ++i) {
         float theta = startAngle + (endAngle - startAngle) * float(i) / 50.0f;
