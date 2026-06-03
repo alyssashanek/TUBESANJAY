@@ -27,9 +27,9 @@ Pada game ini, pemain dapat mengendalikan mobil untuk berkeliling lintasan balap
 ## Cara Menjalankan
 Compile program menggunakan:
 ```bash
-g++ main.cpp globals.cpp helpers.cpp environment.cpp track.cpp car.cpp ui.cpp input.cpp game.cpp -o racingf.exe -lfreeglut -lopengl32 -lglu32 -lwinmm
+g++ main.cpp globals.cpp helpers.cpp environment.cpp track.cpp car.cpp ui.cpp input.cpp game.cpp -o game.exe -lfreeglut -lopengl32 -lglu32 -lwinmm
 ```
 Jalankan dengan:
 ```bash
-./racingf.exe
+./game.exe
 ```
